@@ -47,7 +47,12 @@ extern "C" fn handle() {
                     session_info.session_status = SessionStatus::WaitWordleStartReply;
 
                     exec::wait();
-                    
+
+                }
+                SessionStatus::ReplyReceived(_wordle_event) => {
+                    // Handle the case where a `ReplyReceived` state exists
+                    // In this case, it means the StartGame has already received a reply from Wordle
+                        session_info.session_status = SessionStatus::WaitUserInput;
                     // Send a delayed message to check the game status after a delay
                     msg::send_delayed(
                         exec::program_id(),
@@ -60,11 +65,13 @@ extern "C" fn handle() {
                     )
                     .expect("Error in send_delayed a message");
 
-                }
+                        msg::reply(GameSessionEvent::StartSuccess, 0)
+                            .expect("Failed to send a reply");
+                    }
+
                 SessionStatus::WaitUserInput | SessionStatus::WaitWordleCheckWordReply => {
                     panic!("The user is already in a game");
                 }
-                _ => {}
             }
         }
         // Handle the CheckWord action
