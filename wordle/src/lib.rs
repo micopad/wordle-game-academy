@@ -4,7 +4,10 @@ use wordle_io::*;
 
 static mut WORDLE: Option<Wordle> = None;
 
+#[cfg(not(test))]
 const BANK_OF_WORDS: [&str; 3] = ["house", "human", "horse"];
+#[cfg(test)]
+const BANK_OF_WORDS: [&str; 1] = ["horse"];
 
 #[derive(Default)]
 struct Wordle {
